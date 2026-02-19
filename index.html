@@ -3,112 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo Hospitals: Medical Ethics Quiz</title>
+    <title>Medical Ethics Assessment - Apollo</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; }
-        .container { max-width: 850px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h1 { color: #004a99; text-align: center; margin-bottom: 10px; }
-        p.subtitle { text-align: center; color: #666; margin-bottom: 30px; }
-        .question-block { margin-bottom: 25px; padding: 20px; border-radius: 8px; border: 1px solid #e1e4e8; transition: 0.3s; }
-        .question-text { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; display: block; }
-        .options { list-style: none; padding: 0; }
-        .options li { margin: 10px 0; padding: 8px; border-radius: 4px; }
-        input[type="radio"] { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
-        button { display: block; width: 100%; padding: 18px; background: #004a99; color: white; border: none; border-radius: 8px; font-size: 20px; font-weight: bold; cursor: pointer; margin-top: 30px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; padding: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h1 { color: #004a99; text-align: center; border-bottom: 2px solid #004a99; padding-bottom: 10px; }
+        .question-card { margin-bottom: 20px; padding: 20px; border: 1px solid #eee; border-radius: 8px; background: #fff; }
+        .question-text { font-weight: bold; font-size: 1.1em; margin-bottom: 15px; display: block; }
+        .option-item { display: block; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.2s; }
+        .option-item:hover { background-color: #f0f7ff; }
+        input[type="radio"] { margin-right: 10px; }
+
+        /* HIGHLIGHTING CLASSES */
+        .selected-correct { background-color: #d4edda !important; border-color: #28a745 !important; color: #155724; font-weight: bold; }
+        .selected-wrong { background-color: #f8d7da !important; border-color: #dc3545 !important; color: #721c24; }
+        .actual-answer { border: 2px dashed #28a745 !important; background-color: #effff2; }
+
+        #score-banner { display: none; text-align: center; padding: 20px; font-size: 24px; font-weight: bold; border-radius: 8px; margin-bottom: 20px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #fff3cd; color: #856404; }
+        button { width: 100%; padding: 15px; background: #004a99; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; font-weight: bold; }
         button:hover { background: #003366; }
-        
-        /* Result Styles */
-        #result-summary { margin-top: 30px; padding: 25px; display: none; text-align: center; font-size: 24px; border-radius: 8px; }
-        .correct-block { border: 2px solid #28a745; background-color: #f1faf2; }
-        .incorrect-block { border: 2px solid #dc3545; background-color: #fff5f5; }
-        .feedback { font-weight: bold; margin-top: 10px; display: none; }
-        .score-good { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .score-bad { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Medical Ethics Knowledge Check</h1>
-    <p class="subtitle">Select the best answer for each question based on today's presentation.</p>
-    
-    <form id="quizForm">
-        <div id="quiz-content"></div>
-        <button type="button" id="submitBtn" onclick="calculateScore()">Submit Assessment</button>
-    </form>
-
-    <div id="result-summary"></div>
-    <button type="button" id="retryBtn" style="display:none; background:#6c757d;" onclick="location.reload()">Restart Quiz</button>
+    <div id="score-banner"></div>
+    <div id="quiz-body"></div>
+    <button id="submit-btn" onclick="checkAnswers()">Submit Assessment</button>
 </div>
 
 <script>
-    const quizData = [
-        { q: "Which core principle emphasizes respecting a patient's right to make their own healthcare decisions?", a: "Autonomy", options: ["Beneficence", "Autonomy", "Justice", "Non-Maleficence"] },
-        { q: "What does the principle of 'Beneficence' require from a healthcare professional?", a: "Acting in the patient's best interest", options: ["Doing no harm", "Ensuring fairness", "Acting in the patient's best interest", "Protecting data privacy"] },
-        { q: "The 'Hippocratic Oath' is a cornerstone of medical ethics originating from which ancient tradition?", a: "Greek", options: ["Indian", "Egyptian", "Greek", "Roman"] },
-        { q: "Which ancient Indian text outlines the ethical duties of physicians, emphasizing compassion?", a: "Charaka Samhita", options: ["Sushruta Samhita", "Charaka Samhita", "Arthashastra", "Vedas"] },
-        { q: "Which body currently oversees medical education and practice standards in India?", a: "National Medical Commission (NMC)", options: ["Medical Council of India (MCI)", "National Medical Commission (NMC)", "NABH", "Ministry of Health"] },
-        { q: "The principle of 'Justice' in medical ethics primarily deals with:", a: "Fair allocation of resources", options: ["Confidentiality", "Fair allocation of resources", "Informed consent", "Avoiding negligence"] },
-        { q: "What is the primary purpose of 'Informed Consent'?", a: "Ensuring voluntary agreement based on full disclosure", options: ["Legal protection for the doctor", "Ensuring voluntary agreement based on full disclosure", "Reducing hospital costs", "Speeding up treatment"] },
-        { q: "Which principle is defined as 'Do no harm and avoid negligence'?", a: "Non-Maleficence", options: ["Justice", "Beneficence", "Autonomy", "Non-Maleficence"] },
-        { q: "In India, what documents are gaining recognition for respecting patient autonomy in terminal situations?", a: "Advance Directives (Living Wills)", options: ["Medical Insurance", "Advance Directives (Living Wills)", "Discharge Summaries", "Consent for Surgery"] },
-        { q: "According to the presentation, what creates a 'special responsibility' for providers to act in good faith?", a: "Information asymmetry", options: ["Corporate profit motives", "Information asymmetry", "Hospital infrastructure", "Patient age"] },
-        { q: "Which of these is a contemporary ethical challenge mentioned in the presentation?", a: "AI-assisted diagnosis", options: ["Basic hygiene", "AI-assisted diagnosis", "Traditional medicine", "Paper documentation"] },
-        { q: "The systematic process of verifying academic degrees and training for clinical teams is called:", a: "Credentialing", options: ["Privileging", "Credentialing", "Licensing", "Recruitment"] },
-        { q: "What defines 'Privileging' for non-clinical staff like IT or Billing?", a: "Defining access to patient data and operational boundaries", options: ["Granting medical degrees", "Defining access to patient data and operational boundaries", "Allowing them to perform surgery", "Setting their salary"] },
-        { q: "Complete and accurate documentation is described as both a legal requirement and an:", a: "Ethical obligation", options: ["Administrative burden", "Optional task", "Ethical obligation", "Marketing tool"] },
-        { q: "One of the 'Golden Rules' states: 'If it's not ethical, it's not ___'", a: "Safe", options: ["Legal", "Safe", "Profitable", "Fast"] }
-    ];
-
-    function initQuiz() {
-        const container = document.getElementById('quiz-content');
-        quizData.forEach((item, i) => {
-            let optionsHTML = item.options.map(opt => 
-                `<li><label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label></li>`
-            ).join('');
-            
-            container.innerHTML += `
-                <div class="question-block" id="block-${i}">
-                    <span class="question-text">${i + 1}. ${item.q}</span>
-                    <ul class="options">${optionsHTML}</ul>
-                    <div class="feedback" id="feedback-${i}"></div>
-                </div>`;
-        });
-    }
-
-    function calculateScore() {
-        let score = 0;
-        quizData.forEach((item, i) => {
-            const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            const block = document.getElementById(`block-${i}`);
-            const feedback = document.getElementById(`feedback-${i}`);
-            
-            feedback.style.display = "block";
-            
-            if (selected && selected.value === item.a) {
-                score++;
-                block.className = "question-block correct-block";
-                feedback.innerHTML = "✓ Correct!";
-                feedback.style.color = "#28a745";
-            } else {
-                block.className = "question-block incorrect-block";
-                feedback.innerHTML = `✗ Incorrect. Correct answer: <strong>${item.a}</strong>`;
-                feedback.style.color = "#dc3545";
-            }
-        });
-
-        const summary = document.getElementById('result-summary');
-        summary.style.display = "block";
-        summary.innerHTML = `Final Score: ${score} / ${quizData.length}`;
-        summary.className = score >= 10 ? 'score-good' : 'score-bad';
-        
-        document.getElementById('submitBtn').style.display = "none";
-        document.getElementById('retryBtn').style.display = "block";
-        window.scrollTo(0, 0);
-    }
-
-    initQuiz();
-</script>
-
-</body>
-</html>
+    const questions = [
+        { q: "Which principle focuses on the patient's right to choose their own treatment?", a: "Autonomy", options: ["Beneficence", "Autonomy", "Justice", "Non-Maleficence"] },
+        { q: "The duty to 'Do No Harm' refers to which principle?", a: "Non-Maleficence", options: ["Autonomy", "Justice", "Non-Maleficence", "Beneficence"] },
+        { q: "Which ancient text is the cornerstone of Indian medical ethics?", a: "Charaka Samhita", options: ["Vedas", "Charaka Samhita", "Sushruta Samhita", "Arthashastra"] },
+        { q: "Who oversees medical education and ethics standards in India today?", a: "National Medical Commission (NMC)", options: ["MCI", "NABH", "National Medical Commission (NMC)", "Ministry of AYUSH"] },
+        { q: "The 'Hippocratic Oath' originated from which civilization?", a: "Greek", options: ["Roman", "Greek", "Egyptian", "Indian"] },
+        { q: "What ethical principle addresses the fair distribution of healthcare resources?", a: "Justice", options: ["Beneficence", "Justice", "Autonomy", "Privacy"] },
+        { q: "Informed Consent must be voluntary and based on what?", a: "Full Disclosure", options: ["Hospital Policy", "Full Disclosure", "Doctor's Preference", "Patient's Wealth"] },
+        { q: "What is 'Information Asymmetry' in healthcare?", a: "The gap in knowledge between doctor and patient", options: ["Difference in hospital sizes", "The gap in knowledge between doctor and patient", "Incorrect billing", "Language barriers"] },
+        { q: "A 'Living Will' is also known as:", a: "Advance Directive", options: ["Medical Record", "Advance Directive", "Insurance Policy", "Consent Form"] },
+        { q: "Verifying the education and training of a clinician is called:", a: "Credentialing", options: ["Licensing", "Privileging", "Credentialing", "Onboarding"] },
+        { q: "Defining the specific procedures a clinician is allowed to perform is:", a: "Privileging", options: ["Credentialing", "Privileging", "Promotion", "Certification"] },
+        { q: "Is documentation considered an ethical obligation?", a: "Yes, it ensures continuity and accountability", options: ["No, it's just administrative", "Yes, it ensures continuity and accountability", "Only for surgery", "Only if the patient asks"] },
+        { q: "Which is a modern ethical challenge mentioned?", a: "AI in healthcare", options: ["Using stethoscopes", "AI in healthcare", "Hand washing", "Paper filing"] },
+        { q: "The Golden Rule states: If it is not ethical, it is not ___.", a: "Safe", options: ["Profitable", "Safe", "Legal", "Possible"] },
+        { q: "Respecting patient dignity is considered:", a: "Non-negotiable", options: ["
