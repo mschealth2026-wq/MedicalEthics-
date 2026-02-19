@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Ethics Knowledge Check</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; line-height: 1.6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #004a99; text-align: center; border-bottom: 2px solid #004a99; padding-bottom: 10px; }
+        .question { margin-bottom: 20px; padding: 15px; border-left: 5px solid #004a99; background: #f9f9f9; }
+        .options { list-style: none; padding: 0; }
+        .options li { margin: 10px 0; }
+        button { display: block; width: 100%; padding: 15px; background: #004a99; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px; }
+        button:hover { background: #003366; }
+        #result { margin-top: 20px; padding: 20px; display: none; text-align: center; font-size: 20px; font-weight: bold; border-radius: 5px; }
+        .correct { background: #d4edda; color: #155724; }
+        .incorrect { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Medical Ethics Assessment</h1>
+    <form id="quizForm">
+        <div id="quiz-container"></div>
+        <button type="button" onclick="calculateScore()">Submit Assessment</button>
+    </form>
+    <div id="result"></div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Which core principle emphasizes respecting a patient's right to make their own healthcare decisions?", a: "Autonomy", options: ["Beneficence", "Autonomy", "Justice", "Non-Maleficence"] },
+        { q: "What does the principle of 'Beneficence' require from a healthcare professional?", a: "Acting in the patient's best interest", options: ["Doing no harm", "Ensuring fairness", "Acting in the patient's best interest", "Protecting data privacy"] },
+        { q: "The 'Hippocratic Oath' is a cornerstone of medical ethics originating from which ancient tradition?", a: "Greek", options: ["Indian (Sanskrit)", "Egyptian", "Greek", "Roman"] },
+        { q: "Which ancient Indian text outlines the ethical duties of physicians, emphasizing compassion?", a: "Charaka Samhita", options: ["Sushruta Samhita", "Charaka Samhita", "Arthashastra", "Vedas"] },
+        { q: "Which body currently oversees medical education and practice standards in India?", a: "National Medical Commission (NMC)", options: ["Medical Council of India (MCI)", "National Medical Commission (NMC)", "NABH", "Ministry of Health"] },
+        { q: "The principle of 'Justice' in medical ethics primarily deals with:", a: "Fair allocation of resources", options: ["Confidentiality", "Fair allocation of resources", "Informed consent", "Avoiding negligence"] },
+        { q: "What is the primary purpose of 'Informed Consent'?", a: "Ensuring voluntary agreement based on full disclosure", options: ["Legal protection for the doctor only", "Ensuring voluntary agreement based on full disclosure", "Reducing hospital costs", "Speeding up treatment"] },
+        { q: "Which principle is defined as 'Do no harm and avoid negligence'?", a: "Non-Maleficence", options: ["Justice", "Beneficence", "Autonomy", "Non-Maleficence"] },
+        { q: "In India, what documents are gaining recognition for respecting patient autonomy in terminal situations?", a: "Advance Directives (Living Wills)", options: ["Medical Insurance", "Advance Directives (Living Wills)", "Discharge Summaries", "Consent for Surgery"] },
+        { q: "According to the presentation, what creates a 'special responsibility' for providers to act in good faith?", a: "Information asymmetry", options: ["Corporate profit motives", "Information asymmetry", "Hospital infrastructure", "Patient age"] },
+        { q: "Which of these is a contemporary ethical challenge mentioned in the presentation?", a: "AI-assisted diagnosis", options: ["Basic hygiene", "AI-assisted diagnosis", "Traditional medicine", "Paper documentation"] },
+        { q: "The systematic process of verifying academic degrees and training for clinical teams is called:", a: "Credentialing", options: ["Privileging", "Credentialing", "Licensing", "Recruitment"] },
+        { q: "What defines 'Privileging' for non-clinical staff like IT or Billing?", a: "Defining access to patient data and operational boundaries", options: ["Granting medical degrees", "Defining access to patient data and operational boundaries", "Allowing them to perform surgery", "Setting their salary"] },
+        { q: "Complete and accurate documentation is described as both a legal requirement and an:", a: "Ethical obligation", options: ["Administrative burden", "Optional task", "Ethical obligation", "Marketing tool"] },
+        { q: "One of the 'Golden Rules' states: 'If it's not ethical, it's not ___'", a: "Safe", options: ["Legal", "Safe", "Profitable", "Fast"] }
+    ];
+
+    function loadQuiz() {
+        const container = document.getElementById('quiz-container');
+        questions.forEach((item, index) => {
+            let html = `<div class="question">
+                <p><strong>${index + 1}. ${item.q}</strong></p>
+                <ul class="options">`;
+            item.options.forEach(opt => {
+                html += `<li><label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label></li>`;
+            });
+            html += `</ul></div>`;
+            container.innerHTML += html;
+        });
+    }
+
+    function calculateScore() {
+        let score = 0;
+        questions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if (selected && selected.value === item.a) {
+                score++;
+            }
+        });
+        const resultDiv = document.getElementById('result');
+        resultDiv.style.display = 'block';
+        resultDiv.innerHTML = `Your Score: ${score} / ${questions.length}`;
+        resultDiv.className = score >= 10 ? 'correct' : 'incorrect';
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    loadQuiz();
+</script>
+
+</body>
+</html>
