@@ -3,300 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo Ethics Assessment</title>
+    <title>Medical Ethics Assessment | Apollo Hospitals</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #004a99;
-            --secondary: #008eb3;
+            --apollo-blue: #004a99;
+            --apollo-teal: #008eb3;
             --success: #27ae60;
             --error: #eb5757;
             --bg: #f8fafc;
-            --text: #1e293b;
-            --card-bg: #ffffff;
+            --card: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            color: var(--text);
+            color: var(--text-main);
             margin: 0;
             padding: 40px 20px;
+            line-height: 1.6;
         }
 
-        .container {
-            max-width: 900px;
-            margin: auto;
-        }
+        .container { max-width: 850px; margin: auto; }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -1px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            color: #64748b;
-            font-size: 1.1rem;
-        }
+        /* Header Section */
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: var(--apollo-blue); font-weight: 700; margin-bottom: 8px; }
+        .header p { color: var(--text-sub); font-size: 1.1rem; margin-top: 0; }
 
         /* Progress Bar */
-        .progress-wrapper {
-            background: #e2e8f0;
-            height: 8px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            overflow: hidden;
+        .progress-container { background: #e2e8f0; height: 6px; border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--apollo-blue), var(--apollo-teal)); transition: width 0.3s ease; }
+
+        /* Floating Score Summary */
+        .result-summary { 
+            display: none; background: var(--apollo-blue); color: white; padding: 25px; 
+            border-radius: 16px; text-align: center; margin-bottom: 30px; 
+            box-shadow: 0 10px 25px rgba(0,74,153,0.2); animation: slideIn 0.5s ease-out;
         }
-        #progress-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 0.4s ease;
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Question Cards */
+        .q-card { 
+            background: var(--card); padding: 35px; border-radius: 20px; margin-bottom: 25px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0; transition: transform 0.2s;
+        }
+        .q-meta { font-size: 0.75rem; font-weight: 700; color: var(--apollo-teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+        .q-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 25px; display: block; color: var(--apollo-blue); }
+
+        /* Option Styling */
+        .options-list { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 600px) { .options-list { grid-template-columns: 1fr; } }
+        
+        .opt-label { 
+            display: flex; align-items: center; padding: 18px; border: 2px solid #f1f5f9; 
+            border-radius: 14px; cursor: pointer; transition: all 0.2s; font-weight: 500;
+        }
+        .opt-label:hover { border-color: var(--apollo-blue); background: #f0f7ff; }
+        input[type="radio"] { margin-right: 15px; transform: scale(1.3); accent-color: var(--apollo-blue); }
+
+        /* HIGH-LIGHTING CLASSES */
+        .correct-pick { background-color: #ecfdf5 !important; border-color: var(--success) !important; color: #065f46 !important; }
+        .wrong-pick { background-color: #fef2f2 !important; border-color: var(--error) !important; color: #991b1b !important; }
+        .actual-correct-hint { border: 2.5px solid var(--success) !important; position: relative; }
+        .actual-correct-hint::after { 
+            content: "CORRECT ANSWER"; position: absolute; top: -12px; right: 15px; 
+            background: var(--success); color: white; font-size: 0.65rem; padding: 2px 10px; 
+            border-radius: 5px; font-weight: 900; 
         }
 
-        .question-card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            margin-bottom: 24px;
-            border: 1px solid #e2e8f0;
-            transition: transform 0.2s ease;
+        .submit-btn { 
+            width: 100%; padding: 22px; background: var(--apollo-blue); color: white; 
+            border: none; border-radius: 16px; font-size: 1.2rem; font-weight: 700; 
+            cursor: pointer; transition: 0.3s; box-shadow: 0 4px 14px rgba(0,74,153,0.3);
         }
-
-        .question-number {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--secondary);
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        .question-text {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            line-height: 1.4;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        @media (max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            padding: 16px;
-            border: 2px solid #f1f5f9;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .option-label:hover {
-            border-color: var(--primary);
-            background: #f0f7ff;
-        }
-
-        input[type="radio"] {
-            margin-right: 12px;
-            accent-color: var(--primary);
-            transform: scale(1.2);
-        }
-
-        /* Result Highlighting */
-        .correct-choice {
-            background-color: #ecfdf5 !important;
-            border-color: var(--success) !important;
-            color: #065f46 !important;
-        }
-
-        .wrong-choice {
-            background-color: #fef2f2 !important;
-            border-color: var(--error) !important;
-            color: #991b1b !important;
-        }
-
-        .actual-answer-hint {
-            border: 2px solid var(--success) !important;
-            position: relative;
-        }
-
-        .actual-answer-hint::after {
-            content: "CORRECT ANSWER";
-            position: absolute;
-            top: -10px;
-            right: 10px;
-            background: var(--success);
-            color: white;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-
-        /* Floating Score */
-        .score-box {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            background: var(--primary);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 30px;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0,74,153,0.3);
-            animation: slideDown 0.5s ease;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 20px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 14px 0 rgba(0,74,153,0.39);
-        }
-
-        .submit-btn:hover {
-            background: #003d80;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,74,153,0.23);
-        }
-
-        .submit-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .submit-btn:hover { background: #003366; transform: translateY(-2px); }
+        .submit-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; box-shadow: none; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>Medical Ethics Mastery</h1>
-        <p>Apollo Hospitals Knowledge Assessment</p>
+        <h1>Medical Ethics Assessment</h1>
+        <p>Interactive Knowledge Check for Healthcare Professionals</p>
     </div>
 
-    <div class="progress-wrapper">
-        <div id="progress-fill"></div>
-    </div>
+    <div class="progress-container"><div id="progress-bar"></div></div>
 
-    <div id="score-box" class="score-box"></div>
+    <div id="result-box" class="result-summary"></div>
 
-    <div id="quiz-container"></div>
-
-    <button id="submit-btn" class="submit-btn" onclick="evaluateQuiz()">Complete Assessment</button>
+    <form id="ethicsQuiz">
+        <div id="quiz-anchor"></div>
+        <button type="button" id="submit-btn" class="submit-btn" onclick="checkResults()">Submit Assessment</button>
+    </form>
 </div>
 
 <script>
     const questions = [
-        { q: "Which core principle emphasizes respecting a patient's right to make their own healthcare decisions?", a: "Autonomy", options: ["Beneficence", "Autonomy", "Justice", "Non-Maleficence"] },
-        { q: "What does the principle of 'Beneficence' require from a healthcare professional?", a: "Acting in the patient's best interest", options: ["Doing no harm", "Ensuring fairness", "Acting in the patient's best interest", "Protecting data privacy"] },
-        { q: "The 'Hippocratic Oath' is a cornerstone of medical ethics originating from which ancient tradition?", a: "Greek", options: ["Indian", "Egyptian", "Greek", "Roman"] },
-        { q: "Which ancient Indian text outlines the ethical duties of physicians?", a: "Charaka Samhita", options: ["Sushruta Samhita", "Charaka Samhita", "Arthashastra", "Vedas"] },
-        { q: "Which body currently oversees medical education and practice standards in India?", a: "National Medical Commission (NMC)", options: ["MCI", "National Medical Commission (NMC)", "NABH", "Ministry of Health"] },
-        { q: "The principle of 'Justice' in medical ethics primarily deals with:", a: "Fair allocation of resources", options: ["Confidentiality", "Fair allocation of resources", "Informed consent", "Avoiding negligence"] },
-        { q: "What is the primary purpose of 'Informed Consent'?", a: "Ensuring voluntary agreement based on full disclosure", options: ["Legal protection for the doctor", "Ensuring voluntary agreement based on full disclosure", "Reducing hospital costs", "Speeding up treatment"] },
-        { q: "Which principle is defined as 'Do no harm and avoid negligence'?", a: "Non-Maleficence", options: ["Justice", "Beneficence", "Autonomy", "Non-Maleficence"] },
-        { q: "In India, what documents respect patient autonomy in terminal situations?", a: "Advance Directives", options: ["Medical Insurance", "Advance Directives", "Discharge Summaries", "Consent for Surgery"] },
-        { q: "What creates a 'special responsibility' for providers to act in good faith?", a: "Information asymmetry", options: ["Corporate profit motives", "Information asymmetry", "Hospital infrastructure", "Patient age"] },
-        { q: "Which is a major contemporary ethical challenge in healthcare?", a: "AI-assisted diagnosis", options: ["Basic hygiene", "AI-assisted diagnosis", "Traditional medicine", "Paper documentation"] },
-        { q: "The systematic process of verifying degrees and training for clinical teams is:", a: "Credentialing", options: ["Privileging", "Credentialing", "Licensing", "Recruitment"] },
-        { q: "Defining specific clinical boundaries and data access is called:", a: "Privileging", options: ["Credentialing", "Privileging", "Promotion", "Certification"] },
-        { q: "Accurate documentation is described in the presentation as:", a: "An ethical obligation", options: ["Administrative burden", "Optional task", "An ethical obligation", "Marketing tool"] },
-        { q: "One of the 'Golden Rules' states: 'If it's not ethical, it's not ___'", a: "Safe", options: ["Legal", "Safe", "Profitable", "Fast"] }
+        { q: "What provides the 'moral compass' for clinical decisions and institutional policies?", a: "Medical Ethics", options: ["Hospital Budget", "Medical Ethics", "Staff Schedules", "Patient Wealth"] },
+        { q: "Which ancient Indian text outlined ethical duties emphasizing compassion and patient welfare?", a: "Charaka Samhita", options: ["Vedas", "Arthashastra", "Sushruta Samhita", "Charaka Samhita"] },
+        { q: "Which principle focuses on respecting a patient's right to make their own choices?", a: "Autonomy", options: ["Justice", "Autonomy", "Beneficence", "Non-Maleficence"] },
+        { q: "The duty to 'Do no harm and avoid negligence' is known as:", a: "Non-Maleficence", options: ["Non-Maleficence", "Beneficence", "Justice", "Confidentiality"] },
+        { q: "Which body currently oversees medical education and practice standards in India?", a: "National Medical Commission (NMC)", options: ["MCI", "NABH", "NMC", "National Medical Commission (NMC)"] },
+        { q: "The fair and equitable allocation of resources is the ethical principle of:", a: "Justice", options: ["Justice", "Informed Consent", "Autonomy", "Beneficence"] },
+        { q: "What creates a 'special responsibility' for providers due to the gap in medical knowledge?", a: "Information Asymmetry", options: ["Information Asymmetry", "Hospital Size", "Billing Errors", "Corporate Profit"] },
+        { q: "Which process verifies that only qualified professionals perform clinical procedures?", a: "Credentialing", options: ["Privileging", "Credentialing", "Onboarding", "Licensing"] },
+        { q: "Defining the specific procedures a clinician is authorized to perform is called:", a: "Privileging", options: ["Credentialing", "Privileging", "Certification", "Promotion"] },
+        { q: "Complete and accurate documentation is both a legal requirement and an:", a: "Ethical Obligation", options: ["Optional Task", "Administrative Burden", "Ethical Obligation", "Marketing Tool"] },
+        { q: "Which modern challenge involves data ownership and algorithmic bias?", a: "Advanced Technologies (AI)", options: ["Basic Hygiene", "Advanced Technologies (AI)", "Paper Filing", "Traditional Medicine"] },
+        { q: "The evolving framework for respecting autonomy in terminal situations is called:", a: "Advance Directives (Living Wills)", options: ["Discharge Summaries", "Insurance Policies", "Advance Directives (Living Wills)", "Consent Forms"] },
+        { q: "The 'Golden Rule' states: 'If it's not ethical, it's not ____'", a: "Safe", options: ["Legal", "Safe", "Profitable", "Fast"] },
+        { q: "Informed consent must be voluntary and based on:", a: "Full Disclosure", options: ["Hospital Policy", "Full Disclosure", "Doctor's Preference", "Patient's Age"] },
+        { q: "Who does medical ethics apply to in a healthcare ecosystem?", a: "All clinical and non-clinical teams", options: ["Doctors only", "Nurses only", "All clinical and non-clinical teams", "Administrators only"] }
     ];
 
-    function render() {
-        const container = document.getElementById('quiz-container');
+    function init() {
+        const anchor = document.getElementById('quiz-anchor');
         questions.forEach((item, i) => {
-            const options = item.options.map(opt => `
-                <label class="option-label" id="label-q${i}-${opt.replace(/\s/g, '')}">
-                    <input type="radio" name="q${i}" value="${opt}" onchange="updateProgress()">
+            const opts = item.options.map(opt => `
+                <label class="opt-label" id="label-q${i}-${opt.replace(/\s/g, '')}">
+                    <input type="radio" name="q${i}" value="${opt}" onchange="trackProgress()">
                     ${opt}
                 </label>
             `).join('');
 
-            container.innerHTML += `
-                <div class="question-card">
-                    <span class="question-number">Question ${i + 1} of 15</span>
-                    <div class="question-text">${item.q}</div>
-                    <div class="options-grid">${options}</div>
+            anchor.innerHTML += `
+                <div class="q-card">
+                    <span class="q-meta">Assessment Point ${i + 1} of 15</span>
+                    <span class="q-text">${item.q}</span>
+                    <div class="options-list">${opts}</div>
                 </div>
             `;
         });
     }
 
-    function updateProgress() {
+    function trackProgress() {
         const answered = document.querySelectorAll('input[type="radio"]:checked').length;
-        const percent = (answered / questions.length) * 100;
-        document.getElementById('progress-fill').style.width = percent + "%";
+        document.getElementById('progress-bar').style.width = (answered / questions.length) * 100 + "%";
     }
 
-    function evaluateQuiz() {
+    function checkResults() {
         let score = 0;
         questions.forEach((item, i) => {
             const selected = document.querySelector(`input[name="q${i}"]:checked`);
-            const correctValue = item.a;
-            const correctLabel = document.getElementById(`label-q${i}-${correctValue.replace(/\s/g, '')}`);
+            const correctLabel = document.getElementById(`label-q${i}-${item.a.replace(/\s/g, '')}`);
             
-            // Mark the actual correct answer
-            correctLabel.classList.add('actual-answer-hint');
+            // Mark the correct one
+            correctLabel.classList.add('actual-correct-hint');
 
             if (selected) {
                 const selectedLabel = document.getElementById(`label-q${i}-${selected.value.replace(/\s/g, '')}`);
-                if (selected.value === correctValue) {
+                if (selected.value === item.a) {
                     score++;
-                    selectedLabel.classList.add('correct-choice');
+                    selectedLabel.classList.add('correct-pick');
                 } else {
-                    selectedLabel.classList.add('wrong-choice');
+                    selectedLabel.classList.add('wrong-pick');
                 }
             }
         });
 
-        const scoreBox = document.getElementById('score-box');
-        scoreBox.style.display = 'block';
-        scoreBox.innerHTML = `<h3>Assessment Complete</h3><p>You scored <strong>${score} out of ${questions.length}</strong></p>`;
+        const box = document.getElementById('result-box');
+        box.style.display = 'block';
+        box.innerHTML = `<h2>Assessment Results</h2><p style="font-size: 1.5rem">You scored <strong>${score} / ${questions.length}</strong></p>`;
         
-        const btn = document.getElementById('submit-btn');
-        btn.innerText = "Review Your Results Below";
-        btn.disabled = true;
-        
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('submit-btn').innerText = "Review Your Answers Below";
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    render();
+    init();
 </script>
 
 </body>
